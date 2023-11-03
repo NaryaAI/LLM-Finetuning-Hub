@@ -289,20 +289,39 @@ model.active_adapters = adapter_name
 # * This function will only push the ORIGINAL model, you'll need to push tokenizer too
 # * This will upload the whole model, so it will be heavier memory wise
 
-# In[ ]:
 
-
+# cache_dir = "/home/ec2-user/SageMaker/cache"  # make sure there is enough space
+#
 # model = AutoModelForCausalLM.from_pretrained(
-#     name,
-#     load_in_8bit=True,
-#     device_map="auto",
+#     model_name,
+#     torch_dtype=torch.float16,
+#     device_map="cpu",  why cpu? see https://github.com/artidoro/qlora/issues/29#issuecomment-1737072311
 #     cache_dir=cache_dir,
 # )
-# model.load_adapter("./some_output")
-# # or model.load_adapter(<some_repo_id_if_push_adapters_to_hub_already>)
-# model.push_to_hub("Narya-ai/zephyr-title-subtitle-full-merged", private=True) # private is False by default
-# tokenizer.push_to_hub("Narya-ai/zephyr-title-subtitle-full-merged", private=True)
-
+#
+# adapter = PeftModel.from_pretrained(
+#     model=model,
+#     model_id="./some_output/checkpoint-200",
+#     torch_dtype=torch.float16,
+#     device_map="cpu",  # why cpu? see https://github.com/artidoro/qlora/issues/29#issuecomment-1737072311
+#
+# )
+# model = adapter.merge_and_unload(progressbar=True)
+# tokenizer = AutoTokenizer.from_pretrained(model_name)
+# model.save_pretrained(
+#     "Narya-ai/zephyr-title-subtitle",
+#     push_to_hub=True,
+#     repo_id="Narya-ai/zephyr-title-subtitle",
+#     private=True,
+#     max_shard_size="4GB"
+#
+# )
+# tokenizer.save_pretrained(
+#     "Narya-ai/zephyr-title-subtitle",
+#     push_to_hub=True,
+#     repo_id="Narya-ai/zephyr-title-subtitle",
+#     private=True,
+# )
 
 # ### Quick inference check
 
